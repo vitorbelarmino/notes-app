@@ -22,15 +22,22 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       console.warn(error);
     }
   };
-  const getUserId = () => {
+  const getUserId = async () => {
     const useId = localStorage.getItem("coreLab.user_id");
-
-    if (!useId) {
+    if (useId) {
+      try {
+        await api.get(`/user/${useId}`);
+        setUserId(useId);
+      } catch (error: any) {
+        if (error.response.data.error === "User não encontrado") {
+          localStorage.removeItem("coreLab.user_id");
+          createUser();
+        }
+        console.warn(error);
+      }
+    } else {
       createUser();
-      return;
     }
-
-    setUserId(useId);
   };
 
   useEffect(() => {
