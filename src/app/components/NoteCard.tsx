@@ -18,7 +18,8 @@ export default function NoteCard({ note }: NoteProps) {
   const [data, setData] = useState<INote>(note);
   const [edit, setEdit] = useState(false);
   const [colorOptions, setColorOptions] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [closeLoading, setCloseLoading] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
   const { updateNote, deleteNote } = notesContext();
 
   const setColor = (color: string) => {
@@ -33,11 +34,13 @@ export default function NoteCard({ note }: NoteProps) {
     setColorOptions(false);
   };
 
-  const handleSetFavorite = () => {
-    updateNote({
+  const handleSetFavorite = async () => {
+    setFavoriteLoading(true);
+    await updateNote({
       ...data,
       favorite: !data.favorite,
     });
+    setFavoriteLoading(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -60,9 +63,9 @@ export default function NoteCard({ note }: NoteProps) {
   };
 
   const handleDelete = async () => {
-    setLoading(true);
+    setCloseLoading(true);
     await deleteNote(data);
-    setLoading(false);
+    setCloseLoading(false);
   };
 
   return (
@@ -81,13 +84,17 @@ export default function NoteCard({ note }: NoteProps) {
           onKeyDown={handleSubmit}
           className="focus:outline-none  placeholder:text-black placeholder:font-bold text-sm w-full bg-transparent "
         />
-        <Image
-          className="cursor-pointer hover:scale-[110%]"
-          alt="favorite icon"
-          src={data.favorite ? FavoriteOn : FavoriteOff}
-          width={19}
-          onClick={handleSetFavorite}
-        />
+        {favoriteLoading ? (
+          <Loading />
+        ) : (
+          <Image
+            className="cursor-pointer hover:scale-[110%]"
+            alt="favorite icon"
+            src={data.favorite ? FavoriteOn : FavoriteOff}
+            width={19}
+            onClick={handleSetFavorite}
+          />
+        )}
       </div>
       <textarea
         disabled={!edit}
@@ -120,7 +127,7 @@ export default function NoteCard({ note }: NoteProps) {
           </div>
         </div>
         <p className="w-[13px] h-[13px] cursor-pointer hover:scale-[110%]">
-          {loading ? (
+          {closeLoading ? (
             <Loading />
           ) : (
             <Image src={closeIcon} alt="closer " width={14} onClick={handleDelete} />

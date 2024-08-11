@@ -5,6 +5,7 @@ import FavoriteOn from "../../assets/favorite-on.png";
 import FavoriteOff from "../../assets/favorite-off.png";
 import { Auth } from "../../context/AuthContext";
 import { notesContext } from "../../context/NoteContext";
+import { Loading } from "./Loading";
 
 export function CreateNotes() {
   const [favorite, setFavorite] = useState(false);
@@ -12,6 +13,7 @@ export function CreateNotes() {
     title: "",
     content: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const { userId } = Auth();
   const { createNote } = notesContext();
@@ -26,13 +28,15 @@ export function CreateNotes() {
 
   const handleSubmit = async (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (e.code === "Enter") {
+      if (loading) return;
+      setLoading(true);
       const success = await createNote({ ...noteInfo, favorite, userId });
       if (!success) {
-        console.log("Erro ao criar nota");
+        setLoading(false);
         return;
       }
-      console.log("Nota criada com sucesso");
       setNoteInfo({ title: "", content: "" });
+      setLoading(false);
     }
   };
 
@@ -57,14 +61,17 @@ export function CreateNotes() {
             onClick={() => setFavorite(!favorite)}
           />
         </div>
-        <textarea
-          name="content"
-          placeholder="Criar nota..."
-          onChange={handleChange}
-          onKeyDown={handleSubmit}
-          value={noteInfo.content}
-          className="resize-none h-11 w-full focus:outline-none px-4 pt-3 text-xs placeholder:text-xs"
-        ></textarea>
+        <div className="flex items-end p-4 pb-2">
+          <textarea
+            name="content"
+            placeholder="Criar nota..."
+            onChange={handleChange}
+            onKeyDown={handleSubmit}
+            value={noteInfo.content}
+            className="resize-none h-11 w-full focus:outline-none px-4 pt-3 text-xs placeholder:text-xs"
+          ></textarea>
+          {loading && <Loading />}
+        </div>
       </div>
     </div>
   );
