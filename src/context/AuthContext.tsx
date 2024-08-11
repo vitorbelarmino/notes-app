@@ -17,6 +17,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       const { data } = await api.post("/user/create");
 
       localStorage.setItem("coreLab.user_id", data.userId);
+      setUserId(data.userId);
     } catch (error) {
       console.warn(error);
     }
