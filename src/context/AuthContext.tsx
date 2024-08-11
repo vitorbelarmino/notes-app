@@ -14,10 +14,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   const createUser = async () => {
     try {
-      console.log(api);
-
       const { data } = await api.post("/user/create");
-      console.log(data);
 
       localStorage.setItem("coreLab.user_id", data.userId);
     } catch (error) {
@@ -31,11 +28,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       createUser();
       return;
     }
+
     setUserId(useId);
   };
 
   useEffect(() => {
-    console.log("userId", userId);
     getUserId();
   }, []);
   return <AuthContext.Provider value={{ userId }}>{children}</AuthContext.Provider>;
